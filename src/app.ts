@@ -1,6 +1,6 @@
 import express from 'express';
 import createHttpError from 'http-errors';
-import {userRouter} from './routes/user.routes'
+import { userRouter } from './routes/user.routes';
 import { globalErrorHandler } from './middleware/globalErrorHandler';
 
 const app = express();
@@ -19,10 +19,9 @@ app.get('/', (req, res) => {
 // if req hanlder is async we pass next(erro)
 // if not then just pass the flow
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRouter);
-
-
-
 
 app.use(globalErrorHandler);
 export default app;
