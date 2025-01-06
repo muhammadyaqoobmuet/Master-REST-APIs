@@ -24,6 +24,14 @@ export const registerUser = async (
   }
 
 
+  // checking user in DB it already exists of not
+
+  try {
+        
+  } catch (error) {
+    
+  }
+
   
   res.status(200).json({
     message: 'user created LOL',
