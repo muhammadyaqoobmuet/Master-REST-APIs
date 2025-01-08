@@ -2,6 +2,7 @@ import express from 'express';
 import createHttpError from 'http-errors';
 import { userRouter } from './routes/user.routes';
 import { globalErrorHandler } from './middleware/globalErrorHandler';
+import { booksRouter } from './routes/books.routes';
 
 const app = express();
 
@@ -22,6 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRouter);
+app.use('/api/books', booksRouter);
 
 app.use(globalErrorHandler);
 export default app;
