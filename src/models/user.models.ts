@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // Interface for TypeScript
-interface IUser extends Document {
+export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
