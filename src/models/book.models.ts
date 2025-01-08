@@ -31,7 +31,7 @@ const bookSchema: Schema<IBooks> = new Schema(
     },
     coverImage: {
       type: String,
-      required: false,
+      required: true,
     },
     file: {
       type: String,
