@@ -1,58 +1,59 @@
 import express, { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import User from '../models/user.models';
-import bcrypt from "bcrypt"
+import bcrypt from 'bcrypt';
+import { sign } from 'jsonwebtoken';
+import { config } from '../config/config';
+
 export const registerUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // getting data from params
   const { name, email, password } = req.body as {
     name: string;
     email: string;
     password: string;
   };
-  console.log(name, email, password);
 
-  // validation
+  // Validation
   if (!name || !email || !password) {
-    const createdError: createHttpError.HttpError<400> = createHttpError(
-      400,
-      'invaild input all feilds are required'
+    return next(
+      createHttpError(400, 'Invalid input: All fields are required.')
     );
-    return next(createdError);
   }
-
-  // checking user in DB it already exists of not
 
   try {
-    const user = await User.findOne({ email });
-
-    // checking if user exists or not 
-    if (user) {
-      const userExistsError = createHttpError(
-        400,
-        'user already exsists ! try to login  '
-      );
-      next(userExistsError);
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(createHttpError(400, 'User already exists! Try to log in.'));
     }
 
-    // if flow is here means user does not exists
+    // Hash password and create new user
+    const hashedPassword = await bcrypt.hash(password, 11);
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-    const hashedPassword = await bcrypt.hash(password,11);
+    // Generate JWT token
+    const token = sign({ sub: newUser._id }, config.JSON_SEC as string, {
+      expiresIn: '1d',
+    });
 
-
-
-
-
-
-
-  } catch (error) {
-    next(error);
+    res.status(200).json({
+      id: newUser._id,
+      name: newUser.name,
+      token,
+    });
+  } catch (error: unknown) {
+    // Improved error handling
+    if (error instanceof Error) {
+      next(createHttpError(500, `Server Error: ${error.message}`));
+    } else {
+      next(createHttpError(500, 'Unknown server error occurred.'));
+    }
   }
-
-  res.status(200).json({
-    message: 'user created LOL',
-  });
 };
