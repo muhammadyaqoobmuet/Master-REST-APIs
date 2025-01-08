@@ -58,16 +58,49 @@ export const registerUser = async (
   }
 };
 
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { email, password } = req.body as { email: string; password: string };
 
-export const loginUser = async (req:Request , res:Response , next:NextFunction ) =>{
-
-  const {email , password} = req.body as {email : string , password:string}
-
-
-  try {
-    
-  } catch (error) {
-    
+  // Validate input
+  if (!email || !password) {
+    return next(createHttpError(400, 'All fields are required!'));
   }
 
-}
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(createHttpError(404, 'User not found!'));
+    }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(createHttpError(401, 'Invalid email or password!'));
+    }
+
+    // Generate token
+    const token = sign({ sub: user._id }, config.JSON_SEC as string, {
+      expiresIn: '1d',
+    });
+
+    // Respond with token
+    res.status(200).json({
+      token,
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    return next(
+      createHttpError(
+        500,
+        `Server Error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      )
+    );
+  }
+};
