@@ -43,7 +43,7 @@ export const registerUser = async (
       expiresIn: '1d',
     });
 
-    res.status(200).json({
+    res.status(201).json({
       id: newUser._id,
       name: newUser.name,
       token,
@@ -57,3 +57,17 @@ export const registerUser = async (
     }
   }
 };
+
+
+export const loginUser = async (req:Request , res:Response , next:NextFunction ) =>{
+
+  const {email , password} = req.body as {email : string , password:string}
+
+
+  try {
+    
+  } catch (error) {
+    
+  }
+
+}
