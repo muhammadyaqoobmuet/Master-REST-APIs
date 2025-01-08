@@ -5,6 +5,7 @@ const _config = {
   MONGO_URL: process.env.MONGO_URL,
   env: process.env.NODE_ENV,
   JSON_SEC: process.env.JSON_SEC,
+  CLOUDNARY_SEC: process.env.CLOUDNARY_SEC,
 };
 
 export const config = Object.freeze(_config);
