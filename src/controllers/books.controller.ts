@@ -10,5 +10,9 @@ export const createBook = async (
   res: Response,
   next: NextFunction
 ) => {
+
+  console.log(req.files);
+  
+
   res.json({});
 };
