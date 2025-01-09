@@ -1,4 +1,9 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, {
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from 'express';
 import createHttpError from 'http-errors';
 import User from '../models/user.models';
 import bcrypt from 'bcrypt';
@@ -8,11 +13,7 @@ import path from 'node:path';
 import cloudinary from '../config/cloudnary';
 import Book from '../models/book.models';
 import fs from 'node:fs';
-import {
-  authenticateMiddleware,
-  AuthRequest,
-} from '../middleware/authenticate';
-import { StringSchemaDefinition } from 'mongoose';
+import { AuthRequest } from '../middleware/authenticate';
 
 export const createBook = async (
   req: Request,
@@ -200,33 +201,41 @@ export const getBook = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { page = 1, limit = 10 } = req.query;
-
-  // Convert to integers and handle default values
-  const pageNumber = parseInt(page as string) || 1;
-  const pageLimit = parseInt(limit as string) || 10;
-
-  // Calculate the number of documents to skip
-  const skip = (pageNumber - 1) * pageLimit;
+  const { id } = req.params; // Assuming the book ID is passed as a route parameter
 
   try {
-    // Fetch books with pagination
-    const books = await Book.find().skip(skip).limit(pageLimit);
+    if (id) {
+      // Fetch a single book by its ID
+      const book = await Book.findById(id);
 
-    // Get the total number of books
-    const totalBooks = await Book.countDocuments();
+      if (!book) {
+        next(createHttpError(404, 'Book not found'));
+        return;
+      }
 
-    // Calculate total pages
-    const totalPages = Math.ceil(totalBooks / pageLimit);
+      res.status(200).json(book);
+      return;
+    } else {
+      // Fetch all books with pagination
+      const pageNumber = parseInt(page as string) || 1;
+      const pageLimit = parseInt(limit as string) || 10;
+      const skip = (pageNumber - 1) * pageLimit;
 
-    res.status(200).json({
-      totalBooks,
-      totalPages,
-      currentPage: pageNumber,
-      books,
-    });
+      const books = await Book.find().skip(skip).limit(pageLimit);
+      const totalBooks = await Book.countDocuments();
+      const totalPages = Math.ceil(totalBooks / pageLimit);
+
+      res.status(200).json({
+        totalBooks,
+        totalPages,
+        currentPage: pageNumber,
+        books,
+      });
+      return;
+    }
   } catch (error) {
-    next(createHttpError(500, `Error fetching books: ${error}`));
+    next(createHttpError(500, `Error fetching book(s): ${error}`));
   }
 };

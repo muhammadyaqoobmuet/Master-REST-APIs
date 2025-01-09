@@ -82,5 +82,5 @@ booksRouter.route('/update/:id').patch(
   ]),
   updateBook
 );
-
 booksRouter.route('/').get(getBook);
+booksRouter.route('/:id').get(getBook);
