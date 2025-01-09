@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBook } from '../controllers/books.controller';
+import { createBook, updateBook } from '../controllers/books.controller';
 import multer from 'multer';
 import path from 'node:path';
 import { authenticateMiddleware } from '../middleware/authenticate';
@@ -69,3 +69,13 @@ booksRouter.route('/create').post(
   ]),
   createBook
 );
+
+booksRouter.route('/update/:id').patch(
+  authenticateMiddleware,
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 }, // Accept one image file for coverImage
+    { name: 'file', maxCount: 1 }, // Accept one PDF file for file
+  ]),
+  updateBook
+);
+
