@@ -1,5 +1,9 @@
 import express from 'express';
-import { createBook, updateBook } from '../controllers/books.controller';
+import {
+  createBook,
+  getBook,
+  updateBook,
+} from '../controllers/books.controller';
 import multer from 'multer';
 import path from 'node:path';
 import { authenticateMiddleware } from '../middleware/authenticate';
@@ -79,3 +83,4 @@ booksRouter.route('/update/:id').patch(
   updateBook
 );
 
+booksRouter.route('/').get(getBook);

@@ -195,3 +195,38 @@ export const updateBook = async (
   }
 };
 
+// making it public
+export const getBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { page = 1, limit = 10 } = req.query;
+
+  // Convert to integers and handle default values
+  const pageNumber = parseInt(page as string) || 1;
+  const pageLimit = parseInt(limit as string) || 10;
+
+  // Calculate the number of documents to skip
+  const skip = (pageNumber - 1) * pageLimit;
+
+  try {
+    // Fetch books with pagination
+    const books = await Book.find().skip(skip).limit(pageLimit);
+
+    // Get the total number of books
+    const totalBooks = await Book.countDocuments();
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalBooks / pageLimit);
+
+    res.status(200).json({
+      totalBooks,
+      totalPages,
+      currentPage: pageNumber,
+      books,
+    });
+  } catch (error) {
+    next(createHttpError(500, `Error fetching books: ${error}`));
+  }
+};
