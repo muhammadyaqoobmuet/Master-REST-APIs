@@ -23,7 +23,7 @@ const bookSchema: Schema<IBooks> = new Schema(
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User', // Reference to the User model
-      required: true,
+      required: false,
     },
     genre: {
       type: String,
