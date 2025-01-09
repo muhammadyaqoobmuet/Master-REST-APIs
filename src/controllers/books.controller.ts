@@ -12,8 +12,10 @@ export const createBook = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req.files);
+  const { title, author, genre } = req.body;
+
   const files = req.files as { [filename: string]: Express.Multer.File[] };
+
   let coverImageMimeType;
   let coverImageFileName;
   let coverImageFilePath;
@@ -44,28 +46,45 @@ export const createBook = async (
     next(createHttpError(400, 'pdf file is required'));
   }
 
-  // uploading image
-  const uploadResultofCoverImage = await cloudinary.uploader.upload(
-    coverImageFilePath as string,
-    {
-      filename_override: coverImageFileName,
-      folder: 'book-covers',
-      format: coverImageMimeType,
-    }
-  );
 
-  // uploading filePdf
 
-  const uploadFilePdfResults = await cloudinary.uploader.upload(
-    filePath as string,
-    {
-      filename_override: fileName,
-      folder: 'books',
-      format: 'pdf',
-      resource_type: 'raw',
-    }
-  );
-  console.log(uploadFilePdfResults);
-  console.log(uploadResultofCoverImage);
+  try {
+    // uploading image
+    const uploadResultofCoverImage = await cloudinary.uploader.upload(
+      coverImageFilePath as string,
+      {
+        filename_override: coverImageFileName,
+        folder: 'book-covers',
+        format: coverImageMimeType,
+      }
+    );
+    console.log(uploadResultofCoverImage);
+    // upload file
+    const uploadFilePdfResults = await cloudinary.uploader.upload(
+      filePath as string,
+      {
+        filename_override: fileName,
+        folder: 'books',
+        format: 'pdf',
+        resource_type: 'raw',
+      }
+    );
+
+    // updating db 
+    
+
+
+
+
+    console.log(uploadFilePdfResults);
+  } catch (error) {
+    next(createHttpError(400, `${error}`));
+  }
+
+ 
+
+ 
+ 
+
   res.json({});
 };
