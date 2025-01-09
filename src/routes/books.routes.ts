@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createBook,
+  deleteBook,
   getBook,
   updateBook,
 } from '../controllers/books.controller';
@@ -84,3 +85,4 @@ booksRouter.route('/update/:id').patch(
 );
 booksRouter.route('/').get(getBook);
 booksRouter.route('/:id').get(getBook);
+booksRouter.route('/:id').delete(authenticateMiddleware, deleteBook);

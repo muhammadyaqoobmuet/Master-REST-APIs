@@ -239,3 +239,48 @@ export const getBook = async (
     next(createHttpError(500, `Error fetching book(s): ${error}`));
   }
 };
+
+export const deleteBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+
+  // cehck books exits or not
+
+  const book = await Book.findById(id);
+
+  // book not found
+  if (!book) {
+    return next(createHttpError(403, 'book not found'));
+  }
+
+  // book found check if user is authenticated whom is deleteing
+
+  const _req = req as AuthRequest;
+  if (book?.author?.toString() !== _req.userId) {
+    return next(
+      createHttpError(403, 'Access denied: You cannot edit this book')
+    );
+  }
+
+  // user is authenticated and dont delete from db also delete from cloudnary
+  // https://res.cloudinary.com/diinw6tgw/image/upload/v1736423331/book-covers/as8dnyfsz9hx3zmydyhw.png ->  book-covers/as8dnyfsz9hx3zmydyhw public id
+  const publicNameCoverImage =
+    'book-cover/' +
+    (book.coverImage as string).split('/').at(-1)?.split('.').at(0);
+
+  const publicNameFile =
+    'books/' +
+    (book.file as string).split('/').at(-1)?.split('.').at(0) +
+    '.pdf';
+
+  await cloudinary.uploader.destroy(publicNameCoverImage);
+  await cloudinary.uploader.destroy(publicNameFile, {
+    resource_type: 'raw',
+  });
+
+  await book.deleteOne({ _id: id });
+  res.sendStatus(204);
+};
