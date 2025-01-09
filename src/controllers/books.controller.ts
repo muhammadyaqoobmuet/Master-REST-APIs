@@ -8,6 +8,7 @@ import path from 'node:path';
 import cloudinary from '../config/cloudnary';
 import Book from '../models/book.models';
 import fs from 'node:fs';
+import { AuthRequest } from '../middleware/authenticate';
 export const createBook = async (
   req: Request,
   res: Response,
@@ -60,7 +61,7 @@ export const createBook = async (
         format: coverImageMimeType,
       }
     );
-    console.log(uploadResultofCoverImage);
+
     // upload file
     const uploadFilePdfResults = await cloudinary.uploader.upload(
       filePath as string,
@@ -73,9 +74,10 @@ export const createBook = async (
     );
 
     // updating db
-
+    const _req = req as AuthRequest;  // type cast
     const newBook = await Book.create({
       title,
+      author: _req.userId,
       genre,
       coverImage: uploadResultofCoverImage.secure_url,
       file: uploadFilePdfResults.secure_url,
