@@ -2,6 +2,7 @@ import express from 'express';
 import { createBook } from '../controllers/books.controller';
 import multer from 'multer';
 import path from 'node:path';
+import { authenticateMiddleware } from '../middleware/authenticate';
 
 // Configure Multer storage
 const storage = multer.diskStorage({
@@ -61,6 +62,7 @@ export const booksRouter = express.Router();
 
 // Route configuration
 booksRouter.route('/create').post(
+  authenticateMiddleware,
   upload.fields([
     { name: 'coverImage', maxCount: 1 }, // Accept one image file for coverImage
     { name: 'file', maxCount: 1 }, // Accept one PDF file for file
