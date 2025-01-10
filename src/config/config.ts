@@ -6,6 +6,7 @@ const _config = {
   env: process.env.NODE_ENV,
   JSON_SEC: process.env.JSON_SEC,
   CLOUDNARY_SEC: process.env.CLOUDNARY_SEC,
+  FRONTEND_DOMAIN: process.env.FRONTEND_DOMAIN,
 };
 
 export const config = Object.freeze(_config);
