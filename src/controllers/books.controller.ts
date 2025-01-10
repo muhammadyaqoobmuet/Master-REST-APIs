@@ -153,6 +153,12 @@ export const updateBook = async (
       );
 
       updatedCoverImage = uploadCoverImageResult.secure_url;
+
+      const publicNameCoverImage =
+        'book-cover/' +
+        (book.coverImage as string).split('/').at(-1)?.split('.').at(0);
+
+      await cloudinary.uploader.destroy(publicNameCoverImage);
       await fs.promises.unlink(coverImagePath);
     }
 
