@@ -9,6 +9,7 @@ This project is an Express.js-based with type script API for managing books and 
 - Books management with support for file uploads (images and PDFs) using Multer.
 - Middleware-based architecture with global error handling.
 - APIs for user registration, login, and book CRUD operations.
+- note that books api is public which are to get book only with pagination
 
 ## Technologies Used
 
